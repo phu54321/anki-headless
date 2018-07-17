@@ -14,19 +14,22 @@ def deck_due_list():
     """ Returns dictionary mapping from deck name to deck due. """
 
     tree = col().sched.deckDueTree()
+    print(tree)
     # Flatten tree
-    ret = {}
-    def _format_due_tree(tree, prefix=''):
+
+    def _format_due_tree(tree):
+        r = {}
         for deck in tree:
             deckName, _, nCnt, lCnt, rCnt, subTree = deck
-            ret[prefix + deckName] = {
+            r[deckName] = {
                 'newCount': nCnt,
                 'lrnCount': lCnt,
                 'revCount': rCnt,
+                'subDecks': _format_due_tree(subTree)
             }
-            _format_due_tree(subTree, '%s%s::' % (prefix, deckName))
+        return r
 
-    _format_due_tree(tree)
+    ret = _format_due_tree(tree)
     return emitResult(ret)
 
 
